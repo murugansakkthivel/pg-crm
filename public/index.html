@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EAF4FF">
+<title>PG Manager — Owner Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Devanagari:wght@600&family=Noto+Sans+Tamil:wght@600&family=Noto+Sans+Telugu:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--p:#3D86D9;--pl:#EAF4FF;--btn:#9CCBFF;--btnt:#0F2A44;--a:#E08A2E;--ink:#1A1F2B;--q:#5A6272;--bd:#D7DCE4;--bg:#F4F7FB}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Noto Sans Kannada',system-ui,sans-serif}
+body.kn{font-family:'Noto Sans Kannada',Inter,system-ui,sans-serif}
+button,input{font-family:inherit;color:inherit}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;background:#fff;display:flex;flex-direction:column;padding:16px 20px 20px}
+.top{display:flex;align-items:center;gap:10px}
+.circle{width:44px;height:44px;border-radius:22px;border:1px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
+.circle.tint{background:var(--pl);border:none;color:var(--p)}
+.spacer{width:44px;height:44px;flex-shrink:0}
+.prog{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.prog span{font-size:13px;color:var(--q)}
+.bar{height:6px;border-radius:3px;background:#E4E9F0}.bar div{height:6px;border-radius:3px;background:var(--p);transition:width .25s}
+.langchip{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--bd);background:#fff;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0}
+.langchip svg{color:var(--p)}
+.hero{margin-top:22px}
+.hero .ic{width:64px;height:64px;border-radius:32px;background:var(--pl);color:var(--p);display:flex;align-items:center;justify-content:center}
+.hero h1{margin:16px 0 0;font-size:26px;line-height:1.3;font-weight:700}
+.hero p{margin:4px 0 0;font-size:16px;color:var(--q)}
+.body{margin-top:22px;flex:1;display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 16px;border-radius:16px;border:2px solid var(--bd);background:#fff;text-align:left;width:100%;cursor:pointer;font-size:19px;font-weight:600}
+.opt .oi{display:flex;color:var(--p)}
+.opt .chk{margin-left:auto;width:28px;height:28px;border-radius:14px;background:var(--p);color:#fff;display:none;align-items:center;justify-content:center}
+.opt.sel,.chip.sel,.tile.sel{border:3px solid var(--p);background:var(--pl)}
+.opt.sel .chk{display:flex}
+.opt[disabled]{opacity:.45;cursor:default}
+.opt small{display:block;font-size:13px;font-weight:400;color:var(--q)}
+.grid{display:grid;gap:10px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.chip{min-height:56px;border-radius:14px;border:2px solid var(--bd);background:#fff;font-size:17px;font-weight:700;cursor:pointer;padding:4px}
+.chip.big{min-height:72px;font-size:26px}
+.lbl{margin:6px 0 0;font-size:17px;font-weight:600}
+.note{margin:2px 0 0;font-size:14px;line-height:1.45;color:var(--q)}
+.card{border-radius:16px;background:var(--bg);padding:16px}
+.stepper{display:flex;align-items:center;justify-content:space-between}
+.stepper .n{display:flex;flex-direction:column;align-items:center}
+.stepper .n b{font-size:44px;line-height:1}
+.stepper .n span{font-size:14px;color:var(--q)}
+.rbtn{width:56px;height:56px;border-radius:28px;border:2px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sum{border-radius:12px;background:var(--pl);padding:12px 14px;font-size:16px;font-weight:600;color:var(--btnt)}
+.floor{display:flex;flex-direction:column;gap:6px}
+.floor>span{font-size:14px;font-weight:600}
+.tile{min-height:56px;border-radius:12px;border:2px solid var(--bd);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:4px}
+.tile b{font-size:15px}.tile span{font-size:12px;color:var(--q)}
+.dots{display:flex;gap:5px}.dots i{width:11px;height:11px;border-radius:6px;background:var(--p);display:block}
+.link{align-self:flex-start;border:none;background:none;padding:4px 0;font-size:15px;font-weight:600;color:var(--p);cursor:pointer}
+.numin{width:100%;height:60px;border-radius:14px;border:2px solid var(--bd);padding:0 16px;font-size:24px;font-weight:700;letter-spacing:1px}
+.numin:focus{outline:none;border-color:var(--p)}
+.bottom{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.brow{display:flex;align-items:center;gap:12px}
+.mic{color:var(--p)}
+.mic.on{background:var(--pl);border-color:var(--p)}
+.next{flex:1;height:64px;border-radius:16px;border:none;background:var(--btn);color:var(--btnt);font-size:20px;font-weight:700;cursor:pointer}
+.next[disabled]{opacity:.45;cursor:default}
+.help{text-align:center;font-size:14px;color:var(--q)}
+.help b{color:var(--p)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;max-width:360px;width:calc(100% - 40px);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.sheet{position:fixed;inset:0;background:rgba(26,31,43,.35);display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:#fff;width:100%;max-width:430px;border-radius:20px 20px 0 0;padding:20px;display:flex;flex-direction:column;gap:10px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--q)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:6px;display:block}
+.done{display:flex;align-items:center;gap:14px;margin-top:16px}
+.done .ic{width:56px;height:56px;border-radius:28px;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.done h1{margin:0;font-size:24px}.done p{margin:0;font-size:15px;color:var(--q)}
+.act{min-height:92px;border-radius:16px;border:2px solid var(--bd);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:14px;font-weight:600;padding:6px}
+.act svg{color:var(--p)}
+.native-kn{font-family:'Noto Sans Kannada',sans-serif}.native-hi{font-family:'Noto Sans Devanagari',sans-serif}.native-ta{font-family:'Noto Sans Tamil',sans-serif}.native-te{font-family:'Noto Sans Telugu',sans-serif}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="recaptcha"></div>
+<script>
+/* Paste your Firebase web config here to turn on real login + saving.
+   Leave it as null to run in demo mode (no SMS, data stays on this phone). */
+var FIREBASE_CONFIG = null;
+</script>
+<script>
+(function(){
+'use strict';
+var LIVE=!!window.FIREBASE_CONFIG, fb=null, auth=null, db=null, confirmation=null, verifier=null;
+var IC={
+globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+building:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01M8 14h.01M16 14h.01M12 14h.01"/>',
+door:'<rect x="5" y="3" width="14" height="18" rx="1"/><circle cx="15" cy="12" r="1"/>',
+bed:'<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/>',
+rupee:'<path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13h3"/><path d="M9 13c6.67 0 6.67-10 0-10"/>',
+food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+nofood:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+check:'<path d="M20 6 9 17l-5-5"/>',
+back:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+vol:'<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+msg:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
+locate:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/>',
+minus:'<path d="M5 12h14"/>',plus:'<path d="M5 12h14"/><path d="M12 5v14"/>'
+};
+function ic(n,s){s=s||24;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>';}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+/* ---------- words (English + Kannada; other languages fall back to English for now) ---------- */
+var T={
+en:{step:'Step {a} of {b}',next:'Next',finish:'Finish setup',help:'Need help? Call us',langName:'English',
+ q_lang:'Choose your language',q_phone:'Your mobile number',q_otp:'Enter the 6-digit OTP',q_for:'Who is your PG for?',q_loc:'Where is your PG?',q_floors:'How many floors?',q_rooms:'How many rooms on each floor?',q_types:'What type is each room?',q_rent:'Monthly rent for one bed',q_food:'Do you provide food?',q_dep:'Deposit and notice period',q_due:'Which day is rent due?',
+ phone_note:'We send an OTP by SMS. On most phones it fills in by itself.',otp_note:'Demo: any 6 digits work.',
+ ladies:'Ladies',gents:'Gents',both:'Both (co-living)',
+ useloc:'Use my current location',locok:'Location saved',locfail:'Could not get location here. You can skip and add it later.',skip:'Skip for now',
+ count_ground:'Count the ground floor too.',rooms:'rooms',samefloor:'Same on every floor?',yes:'Yes',no:'No',floor:'Floor {n}',
+ pick_type:'1. Pick a type',tap_rooms:'2. Tap the rooms that are this type',copy1:'Same on every floor? Copy Floor 1 to all',copied:'Floor 1 copied to all floors',
+ t1:'Single',t2:'2 share',t3:'3 share',t4:'4 share',r1:'Single room',r2:'2 sharing',r3:'3 sharing',r4:'4 sharing',other:'Other',rent_note:'We only ask about the room types you have.',rent_other:'Rent for one bed (₹)',
+ f3:'Breakfast, lunch, dinner',f2:'Breakfast + dinner',f0:'No food',
+ dep:'Deposit',dep1:'1 month rent',dep0:'No deposit',notice:'Notice period',n15:'15 days',n1:'1 month',n2:'2 months',
+ d1:'1st of every month',d5:'5th of every month',d10:'10th of every month',dj:'Same date they joined',due_note:'We remind tenants on WhatsApp automatically.',
+ ready:'Your PG is ready!',summary:'{f} floors · {r} rooms · {b} beds',empty:'Empty',due:'Rent due',tapchange:'Tap a room to change its type',
+ addt:'Add tenants',a_photo:'Notebook photo',a_link:'WhatsApp link',a_say:'Say it',soon:'Next step: tenant screens. Coming soon.',
+ edit:'Change answers',restart:'Start again',sum_rooms:'{f} floors × {r} rooms = {t} rooms',
+ noVoice:'Voice input is not available here. It works in Chrome when the app is opened from its own link.',heard:'Heard: "{t}"',notMatched:'Heard "{t}", but could not match it. Please tap instead.',
+ ttsNo:'Read-aloud is not available here.',soonLang:'Coming soon',sending:'Please wait…',sendOtp:'Send OTP',verify:'Verify',otpSentTo:'OTP sent to +91 {p}',resend:'Change number',badOtp:'Wrong OTP. Please check and try again.',smsFail:'Could not send SMS. Check the number and try again.',tooMany:'Too many tries. Please wait a few minutes.',logout:'Log out',saved:'Saved',demo:'Demo mode: no real SMS, data stays on this phone.',netFail:'No internet. Your answers are kept and will save when you are back online.'},
+kn:{step:'ಹಂತ {a} / {b}',next:'ಮುಂದೆ',finish:'ಸೆಟಪ್ ಮುಗಿಸಿ',help:'ಸಹಾಯ ಬೇಕೇ? ಕರೆ ಮಾಡಿ',langName:'ಕನ್ನಡ',
+ q_lang:'ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ',q_phone:'ನಿಮ್ಮ ಮೊಬೈಲ್ ನಂಬರ್',q_otp:'6 ಅಂಕಿಯ OTP ನಮೂದಿಸಿ',q_for:'ನಿಮ್ಮ PG ಯಾರಿಗೆ?',q_loc:'ನಿಮ್ಮ PG ಎಲ್ಲಿದೆ?',q_floors:'ಎಷ್ಟು ಮಹಡಿಗಳಿವೆ?',q_rooms:'ಪ್ರತಿ ಮಹಡಿಯಲ್ಲಿ ಎಷ್ಟು ಕೋಣೆಗಳು?',q_types:'ಪ್ರತಿ ಕೋಣೆ ಯಾವ ರೀತಿ?',q_rent:'ಒಂದು ಬೆಡ್‌ಗೆ ತಿಂಗಳ ಬಾಡಿಗೆ',q_food:'ಊಟ ಕೊಡುತ್ತೀರಾ?',q_dep:'ಡೆಪಾಸಿಟ್ ಮತ್ತು ನೋಟೀಸ್',q_due:'ಬಾಡಿಗೆ ಯಾವ ದಿನ ಕೊಡಬೇಕು?',
+ phone_note:'SMS ಮೂಲಕ OTP ಕಳುಹಿಸುತ್ತೇವೆ. ಹೆಚ್ಚಿನ ಫೋನ್‌ಗಳಲ್ಲಿ ತಾನಾಗಿಯೇ ತುಂಬುತ್ತದೆ.',otp_note:'ಡೆಮೋ: ಯಾವುದೇ 6 ಅಂಕಿ ಸಾಕು.',
+ ladies:'ಮಹಿಳೆಯರಿಗೆ',gents:'ಪುರುಷರಿಗೆ',both:'ಎಲ್ಲರಿಗೂ',
+ useloc:'ನನ್ನ ಜಾಗ ಬಳಸಿ',locok:'ಜಾಗ ಉಳಿಸಲಾಗಿದೆ',locfail:'ಇಲ್ಲಿ ಜಾಗ ಸಿಗಲಿಲ್ಲ. ಈಗ ಬಿಟ್ಟು ನಂತರ ಸೇರಿಸಬಹುದು.',skip:'ಈಗ ಬಿಡಿ',
+ count_ground:'ನೆಲ ಮಹಡಿಯನ್ನೂ ಸೇರಿಸಿ ಎಣಿಸಿ.',rooms:'ಕೋಣೆಗಳು',samefloor:'ಎಲ್ಲಾ ಮಹಡಿಯಲ್ಲೂ ಇಷ್ಟೇ?',yes:'ಹೌದು',no:'ಇಲ್ಲ',floor:'ಮಹಡಿ {n}',
+ pick_type:'1. ರೀತಿ ಆಯ್ಕೆ ಮಾಡಿ',tap_rooms:'2. ಆ ರೀತಿಯ ಕೋಣೆಗಳ ಮೇಲೆ ಒತ್ತಿ',copy1:'ಎಲ್ಲಾ ಮಹಡಿ ಒಂದೇ? ಮಹಡಿ 1 ನಕಲಿಸಿ',copied:'ಮಹಡಿ 1 ಎಲ್ಲಾ ಮಹಡಿಗೆ ನಕಲಿಸಲಾಗಿದೆ',
+ t1:'ಒಬ್ಬರಿಗೆ',t2:'ಇಬ್ಬರಿಗೆ',t3:'ಮೂವರಿಗೆ',t4:'ನಾಲ್ವರಿಗೆ',r1:'ಒಬ್ಬರ ಕೋಣೆ',r2:'ಇಬ್ಬರ ಕೋಣೆ',r3:'ಮೂವರ ಕೋಣೆ',r4:'ನಾಲ್ವರ ಕೋಣೆ',other:'ಬೇರೆ',rent_note:'ನಿಮ್ಮಲ್ಲಿರುವ ಕೋಣೆಗಳ ಬಗ್ಗೆ ಮಾತ್ರ ಕೇಳುತ್ತೇವೆ.',rent_other:'ಒಂದು ಬೆಡ್ ಬಾಡಿಗೆ (₹)',
+ f3:'3 ಹೊತ್ತು ಊಟ',f2:'ತಿಂಡಿ + ರಾತ್ರಿ ಊಟ',f0:'ಊಟ ಇಲ್ಲ',
+ dep:'ಡೆಪಾಸಿಟ್',dep1:'1 ತಿಂಗಳ ಬಾಡಿಗೆ',dep0:'ಡೆಪಾಸಿಟ್ ಇಲ್ಲ',notice:'ನೋಟೀಸ್ ಅವಧಿ',n15:'15 ದಿನ',n1:'1 ತಿಂಗಳು',n2:'2 ತಿಂಗಳು',
+ d1:'ತಿಂಗಳ 1ನೇ ತಾರೀಖು',d5:'ತಿಂಗಳ 5ನೇ ತಾರೀಖು',d10:'ತಿಂಗಳ 10ನೇ ತಾರೀಖು',dj:'ಸೇರಿದ ದಿನದಂದು',due_note:'ಬಾಕಿ ಇದ್ದವರಿಗೆ WhatsApp ನಲ್ಲಿ ತಾನಾಗಿಯೇ ನೆನಪಿಸುತ್ತೇವೆ.',
+ ready:'ನಿಮ್ಮ PG ಸಿದ್ಧ!',summary:'{f} ಮಹಡಿ · {r} ಕೋಣೆ · {b} ಬೆಡ್',empty:'ಖಾಲಿ',due:'ಬಾಡಿಗೆ ಬಾಕಿ',tapchange:'ಕೋಣೆ ಒತ್ತಿ ರೀತಿ ಬದಲಿಸಿ',
+ addt:'ಬಾಡಿಗೆದಾರರನ್ನು ಸೇರಿಸಿ',a_photo:'ನೋಟ್‌ಬುಕ್ ಫೋಟೋ',a_link:'WhatsApp ಲಿಂಕ್',a_say:'ಮಾತನಾಡಿ',soon:'ಮುಂದಿನ ಹಂತ: ಬಾಡಿಗೆದಾರರ ಪರದೆಗಳು. ಶೀಘ್ರದಲ್ಲೇ.',
+ edit:'ಉತ್ತರ ಬದಲಿಸಿ',restart:'ಮತ್ತೆ ಶುರು ಮಾಡಿ',sum_rooms:'{f} ಮಹಡಿ × {r} ಕೋಣೆ = {t} ಕೋಣೆಗಳು',
+ noVoice:'ಇಲ್ಲಿ ಧ್ವನಿ ಇನ್‌ಪುಟ್ ಇಲ್ಲ. ಆ್ಯಪ್ ಅನ್ನು ಅದರ ಲಿಂಕ್‌ನಿಂದ Chrome ನಲ್ಲಿ ತೆರೆದಾಗ ಕೆಲಸ ಮಾಡುತ್ತದೆ.',heard:'ಕೇಳಿದ್ದು: "{t}"',notMatched:'"{t}" ಕೇಳಿದೆ, ಆದರೆ ಹೊಂದಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಒತ್ತಿ.',
+ ttsNo:'ಇಲ್ಲಿ ಓದಿ ಹೇಳುವ ಸೌಲಭ್ಯ ಇಲ್ಲ.',soonLang:'ಶೀಘ್ರದಲ್ಲೇ',sending:'ದಯವಿಟ್ಟು ಕಾಯಿರಿ…',sendOtp:'OTP ಕಳುಹಿಸಿ',verify:'ಪರಿಶೀಲಿಸಿ',otpSentTo:'+91 {p} ಗೆ OTP ಕಳುಹಿಸಲಾಗಿದೆ',resend:'ನಂಬರ್ ಬದಲಿಸಿ',badOtp:'OTP ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',smsFail:'SMS ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ. ನಂಬರ್ ಪರಿಶೀಲಿಸಿ.',tooMany:'ತುಂಬಾ ಪ್ರಯತ್ನಗಳು. ಕೆಲವು ನಿಮಿಷ ಕಾಯಿರಿ.',logout:'ಲಾಗ್ ಔಟ್',saved:'ಉಳಿಸಲಾಗಿದೆ',demo:'ಡೆಮೋ: ನಿಜವಾದ SMS ಇಲ್ಲ, ಡೇಟಾ ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.',netFail:'ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ. ಉತ್ತರಗಳು ಉಳಿದಿವೆ, ಆನ್‌ಲೈನ್ ಬಂದಾಗ ಉಳಿಸುತ್ತೇವೆ.'}
+};
+var LANGS=[{id:'en',label:'English',cls:''},{id:'kn',label:'ಕನ್ನಡ',cls:'native-kn',sub:'Kannada'},{id:'hi',label:'हिंदी',cls:'native-hi',sub:'Hindi',soon:true},{id:'ta',label:'தமிழ்',cls:'native-ta',sub:'Tamil',soon:true},{id:'te',label:'తెలుగు',cls:'native-te',sub:'Telugu',soon:true}];
+var PRESET={1:[9000,10000,11000],2:[7000,8000,9000],3:[6000,7000,8000],4:[5000,6000,7000]};
+var STEPS=['lang','phone','for','loc','floors','rooms','types','rent','food','dep','due','ready'];
+
+/* ---------- state ---------- */
+var KEY='pgm-setup-v1';
+function fresh(){return {uid:null,done:false,busy:false,lang:'en',step:0,phone:'',otpSent:false,otp:'',pgFor:null,loc:null,locMsg:'',floors:null,same:true,rpf:[4],paint:2,types:{},rent:{},rentOther:{},food:null,deposit:'2000',notice:'1m',due:'1'};}
+var S=fresh();
+try{var saved=localStorage.getItem(KEY);if(saved){S=Object.assign(fresh(),JSON.parse(saved));}}catch(e){}
+var SETUP_KEYS=['lang','phone','pgFor','loc','floors','same','rpf','types','rent','rentOther','food','deposit','notice','due','done','step'];
+var saveTimer=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+ if(LIVE&&db&&S.uid){clearTimeout(saveTimer);saveTimer=setTimeout(saveRemote,700);}}
+function setupData(){var o={};SETUP_KEYS.forEach(function(k){o[k]=S[k]===undefined?null:S[k];});o.types=JSON.stringify(S.types||{});o.rent=JSON.stringify(S.rent||{});o.rentOther=JSON.stringify(S.rentOther||{});o.updatedAt=fb.firestore.FieldValue.serverTimestamp();return o;}
+function pgRef(){return db.collection('owners').doc(S.uid).collection('pgs').doc('main');}
+function saveRemote(){if(!S.uid)return;pgRef().set(setupData(),{merge:true}).catch(function(){toast(t('netFail'));});}
+function loadRemote(){return pgRef().get().then(function(d){if(!d.exists)return;var o=d.data();SETUP_KEYS.forEach(function(k){if(o[k]!==undefined&&o[k]!==null)S[k]=o[k];});['types','rent','rentOther'].forEach(function(k){try{S[k]=typeof o[k]==='string'?JSON.parse(o[k]):(o[k]||{});}catch(e){S[k]={};}});});}
+function t(k,v){var s=(T[S.lang]||T.en)[k]||T.en[k]||k;if(v){Object.keys(v).forEach(function(x){s=s.split('{'+x+'}').join(v[x]);});}return s;}
+function nFloors(){return S.floors||0;}
+function roomsOn(f){return S.same?(S.rpf[0]||1):(S.rpf[f-1]||S.rpf[0]||1);}
+function ensureTypes(){for(var f=1;f<=nFloors();f++){var n=roomsOn(f),a=S.types[f]||[];while(a.length<n)a.push(2);a.length=n;S.types[f]=a;}Object.keys(S.types).forEach(function(k){if(+k>nFloors())delete S.types[k];});}
+function typesPresent(){ensureTypes();var p={};for(var f=1;f<=nFloors();f++)S.types[f].forEach(function(x){p[x]=1;});return Object.keys(p).map(Number).sort();}
+function totals(){ensureTypes();var r=0,b=0;for(var f=1;f<=nFloors();f++){r+=S.types[f].length;S.types[f].forEach(function(x){b+=x;});}return {r:r,b:b};}
+
+/* ---------- view helpers ---------- */
+function opt(act,val,label,icon,sel,extra){return '<button type="button" class="opt'+(sel?' sel':'')+'" data-act="'+act+'" data-val="'+esc(val)+'" aria-pressed="'+(sel?'true':'false')+'"'+(extra||'')+'>'+(icon?'<span class="oi">'+ic(icon,28)+'</span>':'')+'<span>'+label+'</span><span class="chk">'+ic('check',18)+'</span></button>';}
+function chip(act,val,label,sel,cls){return '<button type="button" class="chip'+(cls?' '+cls:'')+(sel?' sel':'')+'" data-act="'+act+'" data-val="'+esc(val)+'" aria-pressed="'+(sel?'true':'false')+'">'+label+'</button>';}
+function money(n){return '₹'+Number(n).toLocaleString('en-IN');}
+
+var QKEY={lang:'q_lang',phone:'q_phone',for:'q_for',loc:'q_loc',floors:'q_floors',rooms:'q_rooms',types:'q_types',rent:'q_rent',food:'q_food',dep:'q_dep',due:'q_due'};
+var QICON={lang:'globe',phone:'phone',for:'users',loc:'pin',floors:'building',rooms:'door',types:'bed',rent:'rupee',food:'food',dep:'wallet',due:'cal'};
+
+function canNext(){
+ var s=STEPS[S.step];
+ if(s==='phone')return S.otpSent?/^\d{6}$/.test(S.otp):/^[6-9]\d{9}$/.test(S.phone);
+ if(s==='for')return !!S.pgFor;
+ if(s==='floors')return !!S.floors;
+ if(s==='rent')return typesPresent().every(function(x){return S.rent[x]>0;});
+ if(s==='food')return !!S.food;
+ return true;
+}
+
+function bodyFor(s){
+ var h='';
+ if(s==='lang'){LANGS.forEach(function(l){h+='<button type="button" class="opt'+(S.lang===l.id?' sel':'')+'" data-act="lang" data-val="'+l.id+'"'+(l.soon?' disabled':'')+'><span class="'+l.cls+'">'+l.label+(l.soon?'<small>'+t('soonLang')+'</small>':'')+'</span><span class="chk">'+ic('check',18)+'</span></button>';});}
+ else if(s==='phone'){
+  if(!S.otpSent){h+='<label class="lbl" for="ph">+91</label><input id="ph" class="numin" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="98XXXXXXXX" value="'+esc(S.phone)+'" data-in="phone"><p class="note">'+t('phone_note')+'</p>'+(LIVE?'':'<p class="note">'+t('demo')+'</p>');}
+  else{h+='<label class="lbl" for="otp">'+t('q_otp')+'</label><input id="otp" class="numin" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" value="'+esc(S.otp)+'" data-in="otp"><p class="note">'+t('otpSentTo',{p:esc(S.phone)})+(LIVE?'':' · '+t('otp_note'))+'</p><button type="button" class="link" data-act="changeNum">'+t('resend')+'</button>';}
+ }
+ else if(s==='for'){h+=opt('pgFor','ladies',t('ladies'),'user',S.pgFor==='ladies')+opt('pgFor','gents',t('gents'),'user',S.pgFor==='gents')+opt('pgFor','both',t('both'),'users',S.pgFor==='both');}
+ else if(s==='loc'){h+=opt('loc','get',t('useloc'),'locate',!!S.loc);if(S.loc)h+='<div class="card"><b>'+t('locok')+'</b><p class="note">'+S.loc.lat.toFixed(5)+', '+S.loc.lng.toFixed(5)+'</p></div>';else if(S.locMsg)h+='<p class="note">'+esc(S.locMsg)+'</p>';h+='<button type="button" class="link" data-act="skip">'+t('skip')+'</button>';}
+ else if(s==='floors'){h+='<div class="grid g3">';['1','2','3','4','5','6'].forEach(function(n){h+=chip('floors',n,n,String(S.floors)===n,'big');});h+='</div><p class="note">'+t('count_ground')+'</p>';}
+ else if(s==='rooms'){
+  if(S.same){h+=stepperHTML(0);}
+  else{for(var f=1;f<=nFloors();f++){h+='<div class="floor"><span>'+t('floor',{n:f})+'</span>'+stepperHTML(f-1,true)+'</div>';}}
+  h+='<p class="lbl">'+t('samefloor')+'</p><div class="grid g2">'+chip('same','1',t('yes'),S.same)+chip('same','0',t('no'),!S.same)+'</div>';
+  var tot=0;for(var g=1;g<=nFloors();g++)tot+=roomsOn(g);
+  h+='<div class="sum">'+(S.same?t('sum_rooms',{f:nFloors(),r:roomsOn(1),t:tot}):tot+' '+t('rooms'))+'</div>';
+ }
+ else if(s==='types'){
+  ensureTypes();
+  h+='<p class="lbl">'+t('pick_type')+'</p><div class="grid g4">';[1,2,3,4].forEach(function(x){h+=chip('paint',x,t('t'+x),S.paint===x);});h+='</div>';
+  h+='<p class="lbl">'+t('tap_rooms')+'</p>';
+  for(var f2=1;f2<=nFloors();f2++){h+='<div class="floor"><span>'+t('floor',{n:f2})+'</span><div class="grid g4">';S.types[f2].forEach(function(x,i){h+='<button type="button" class="tile'+(x===S.paint?' sel':'')+'" data-act="room" data-val="'+f2+'-'+i+'"><b>'+(f2*100+i+1)+'</b><span>'+t('t'+x)+'</span></button>';});h+='</div></div>';}
+  if(nFloors()>1)h+='<button type="button" class="link" data-act="copy1">'+t('copy1')+'</button>';
+ }
+ else if(s==='rent'){
+  typesPresent().forEach(function(x){
+   var cur=S.rent[x],isOther=S.rentOther[x];
+   h+='<p class="lbl">'+t('r'+x)+'</p><div class="grid g4">';
+   PRESET[x].forEach(function(v){h+=chip('rent',x+'-'+v,money(v),!isOther&&cur===v);});
+   h+=chip('rentOther',x,t('other'),!!isOther)+'</div>';
+   if(isOther)h+='<input class="numin" type="text" inputmode="numeric" maxlength="6" aria-label="'+t('rent_other')+'" placeholder="'+t('rent_other')+'" value="'+(cur||'')+'" data-in="rent-'+x+'">';
+  });
+  h+='<p class="note">'+t('rent_note')+'</p>';
+ }
+ else if(s==='food'){h+=opt('food','3',t('f3'),'food',S.food==='3')+opt('food','2',t('f2'),'food',S.food==='2')+opt('food','0',t('f0'),'nofood',S.food==='0');}
+ else if(s==='dep'){
+  h+='<p class="lbl">'+t('dep')+'</p><div class="grid g2">'+chip('deposit','1m',t('dep1'),S.deposit==='1m')+chip('deposit','2000',money(2000),S.deposit==='2000')+chip('deposit','5000',money(5000),S.deposit==='5000')+chip('deposit','0',t('dep0'),S.deposit==='0')+'</div>';
+  h+='<p class="lbl">'+t('notice')+'</p><div class="grid g3">'+chip('notice','15d',t('n15'),S.notice==='15d')+chip('notice','1m',t('n1'),S.notice==='1m')+chip('notice','2m',t('n2'),S.notice==='2m')+'</div>';
+ }
+ else if(s==='due'){h+=opt('due','1',t('d1'),'cal',S.due==='1')+opt('due','5',t('d5'),'cal',S.due==='5')+opt('due','10',t('d10'),'cal',S.due==='10')+opt('due','join',t('dj'),'user',S.due==='join')+'<p class="note">'+t('due_note')+'</p>';}
+ return h;
+}
+function stepperHTML(idx,small){var v=S.rpf[idx]||S.rpf[0]||1;return '<div class="card stepper"'+(small?' style="padding:10px 14px"':'')+'><button type="button" class="rbtn" data-act="rpf" data-val="'+idx+'-1" aria-label="Less">'+ic('minus',26)+'</button><div class="n"><b'+(small?' style="font-size:32px"':'')+'>'+v+'</b><span>'+t('rooms')+'</span></div><button type="button" class="rbtn" data-act="rpf" data-val="'+idx+'+1" aria-label="More">'+ic('plus',26)+'</button></div>';}
+
+function topHTML(){
+ var back=S.step>0?'<button type="button" class="circle" data-act="back" aria-label="Back">'+ic('back',22)+'</button>':'<div class="spacer"></div>';
+ var n=S.step+1,pct=Math.round(n/STEPS.length*100);
+ var lang=S.step>0?'<button type="button" class="langchip" data-act="langsheet" aria-label="Change language">'+ic('globe',16)+t('langName')+'</button>':'';
+ return '<div class="top">'+back+'<div class="prog"><span>'+t('step',{a:n,b:STEPS.length})+'</span><div class="bar"><div style="width:'+pct+'%"></div></div></div>'+lang+'<button type="button" class="circle tint" data-act="speak" aria-label="Read aloud">'+ic('vol',22)+'</button></div>';
+}
+function bottomHTML(){
+ var last=STEPS[S.step]==='due';
+ var label=last?t('finish'):t('next');
+ if(STEPS[S.step]==='phone')label=S.otpSent?t('verify'):t('sendOtp');
+ if(S.busy)label=t('sending');
+ return '<div class="bottom"><div class="brow"><button type="button" class="circle mic" data-act="mic" aria-label="Speak your answer">'+ic('mic',20)+'</button><button type="button" class="next" data-act="next"'+(canNext()&&!S.busy?'':' disabled')+'>'+label+'</button></div></div>';
+}
+function readyHTML(){
+ ensureTypes();var tt=totals(),h=topHTML();
+ h+='<div class="done"><div class="ic">'+ic('check',30)+'</div><div><h1>'+t('ready')+'</h1><p>'+t('summary',{f:nFloors(),r:tt.r,b:tt.b})+'</p></div></div><div class="body">';
+ for(var f=1;f<=nFloors();f++){h+='<div class="floor"><span>'+t('floor',{n:f})+'</span><div class="grid g4">';S.types[f].forEach(function(x,i){var d='';for(var k=0;k<x;k++)d+='<i></i>';h+='<button type="button" class="tile" data-act="cycle" data-val="'+f+'-'+i+'" aria-label="Room '+(f*100+i+1)+', '+t('t'+x)+'"><b>'+(f*100+i+1)+'</b><span class="dots">'+d+'</span></button>';});h+='</div></div>';}
+ h+='<div class="legend"><span><i style="background:var(--p)"></i>'+t('empty')+'</span><span><i style="background:var(--a)"></i>'+t('due')+'</span><span>'+t('tapchange')+'</span></div>';
+ h+='<p class="lbl" style="margin-top:10px">'+t('addt')+'</p><div class="grid g3">'+['camera|a_photo','msg|a_link','mic|a_say'].map(function(p){var q=p.split('|');return '<button type="button" class="act" data-act="soon">'+ic(q[0],28)+t(q[1])+'</button>';}).join('')+'</div>';
+ h+='<div style="display:flex;justify-content:space-between;margin-top:6px"><button type="button" class="link" data-act="back">'+t('edit')+'</button>'+(LIVE&&S.uid?'<button type="button" class="link" data-act="logout">'+t('logout')+'</button>':'<button type="button" class="link" data-act="restart">'+t('restart')+'</button>')+'</div></div>';
+ return h;
+}
+function render(){
+ document.body.classList.toggle('kn',S.lang==='kn');
+ document.documentElement.lang=S.lang==='kn'?'kn':'en';
+ var s=STEPS[S.step],el=document.getElementById('app');
+ if(s==='ready'){el.innerHTML=readyHTML();save();return;}
+ var q=s==='phone'&&S.otpSent?'q_otp':QKEY[s];
+ el.innerHTML=topHTML()+'<div class="hero"><div class="ic">'+ic(QICON[s],32)+'</div><h1 id="q">'+t(q)+'</h1>'+(s==='lang'&&S.lang!=='kn'?'<p class="native-kn">ಭಾಷೆ ಆಯ್ಕೆ ಮಾಡಿ</p>':'')+'</div><div class="body">'+bodyFor(s)+'</div>'+bottomHTML();
+ save();
+}
+function refreshNext(){var b=document.querySelector('.next');if(b)b.disabled=!canNext();}
+
+/* ---------- toast & sheet ---------- */
+var tt0;function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(tt0);tt0=setTimeout(function(){e.classList.remove('show');},2800);}
+function langSheet(){
+ var d=document.createElement('div');d.className='sheet';
+ d.innerHTML='<div role="dialog" aria-label="Language">'+LANGS.map(function(l){return '<button type="button" class="opt'+(S.lang===l.id?' sel':'')+'" data-lang="'+l.id+'"'+(l.soon?' disabled':'')+'><span class="'+l.cls+'">'+l.label+(l.soon?'<small>'+t('soonLang')+'</small>':'')+'</span><span class="chk">'+ic('check',18)+'</span></button>';}).join('')+'</div>';
+ d.addEventListener('click',function(e){var b=e.target.closest('[data-lang]');if(b&&!b.disabled){S.lang=b.getAttribute('data-lang');render();}d.remove();});
+ document.body.appendChild(d);
+}
+
+/* ---------- voice ---------- */
+function speak(){
+ try{var q=document.getElementById('q');var txt=q?q.textContent:t('ready');if(!('speechSynthesis' in window))throw 0;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(txt);u.lang=S.lang==='kn'?'kn-IN':'en-IN';speechSynthesis.speak(u);}catch(e){toast(t('ttsNo'));}
+}
+var WORDNUM={one:1,two:2,three:3,four:4,five:5,six:6,'ಒಂದು':1,'ಎರಡು':2,'ಮೂರು':3,'ನಾಲ್ಕು':4,'ಐದು':5,'ಆರು':6};
+function listen(btn){
+ var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast(t('noVoice'));return;}
+ var r;try{r=new SR();}catch(e){toast(t('noVoice'));return;}
+ r.lang=S.lang==='kn'?'kn-IN':'en-IN';r.interimResults=false;r.maxAlternatives=1;
+ btn.classList.add('on');
+ r.onresult=function(ev){var said=ev.results[0][0].transcript;applyVoice(said);};
+ r.onerror=function(){toast(t('noVoice'));};
+ r.onend=function(){btn.classList.remove('on');};
+ try{r.start();}catch(e){btn.classList.remove('on');toast(t('noVoice'));}
+}
+function applyVoice(said){
+ var low=said.toLowerCase().trim(),s=STEPS[S.step];
+ var num=(low.match(/\d+/)||[])[0];if(!num){Object.keys(WORDNUM).some(function(w){if(low.indexOf(w)>-1){num=String(WORDNUM[w]);return true;}});}
+ var hit=false;
+ if(s==='phone'){var digits=said.replace(/\D/g,'');if(!S.otpSent&&digits.length>=10){S.phone=digits.slice(-10);hit=true;}else if(S.otpSent&&digits.length>=6){S.otp=digits.slice(0,6);hit=true;}}
+ else if(s==='floors'&&num&&+num>=1&&+num<=6){S.floors=+num;hit=true;}
+ else if(s==='rooms'&&num&&+num>0&&+num<=30){S.rpf[0]=+num;hit=true;}
+ else{
+  var buttons=document.querySelectorAll('.body [data-act]');
+  for(var i=0;i<buttons.length;i++){var lab=buttons[i].textContent.toLowerCase().trim();if(lab&&lab.length>1&&(low.indexOf(lab)>-1||lab.indexOf(low)>-1)){buttons[i].click();toast(t('heard',{t:said}));return;}}
+ }
+ if(hit){render();toast(t('heard',{t:said}));}else toast(t('notMatched',{t:said}));
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input',function(e){
+ var k=e.target.getAttribute('data-in');if(!k)return;
+ var v=e.target.value.replace(/\D/g,'');if(v!==e.target.value)e.target.value=v;
+ if(k==='phone')S.phone=v;else if(k==='otp')S.otp=v;else if(k.indexOf('rent-')===0){S.rent[k.slice(5)]=v?+v:0;}
+ save();refreshNext();
+});
+document.addEventListener('click',function(e){
+ var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+ var a=b.getAttribute('data-act'),v=b.getAttribute('data-val'),s=STEPS[S.step];
+ switch(a){
+ case 'back':if(s==='phone'&&S.otpSent){S.otpSent=false;S.otp='';}else S.step=Math.max(0,S.step-1);break;
+ case 'next':
+  if(!canNext())return;
+  if(s==='phone'&&LIVE){if(!S.otpSent)sendOtp();else confirmOtp();return;}
+  if(s==='phone'&&!S.otpSent){S.otpSent=true;break;}
+  if(s==='rooms'&&S.same){var n=S.rpf[0];S.rpf=[];for(var i=0;i<nFloors();i++)S.rpf.push(n);}
+  S.step=Math.min(STEPS.length-1,S.step+1);if(STEPS[S.step]==='ready')S.done=true;window.scrollTo(0,0);break;
+ case 'lang':S.lang=v;break;
+ case 'langsheet':langSheet();return;
+ case 'speak':speak();return;
+ case 'mic':listen(b);return;
+ case 'pgFor':S.pgFor=v;break;
+ case 'loc':
+  if(!navigator.geolocation){S.locMsg=t('locfail');break;}
+  try{navigator.geolocation.getCurrentPosition(function(p){S.loc={lat:p.coords.latitude,lng:p.coords.longitude};S.locMsg='';render();},function(){S.loc=null;S.locMsg=t('locfail');render();},{timeout:8000});}catch(err){S.locMsg=t('locfail');}
+  break;
+ case 'skip':S.step++;break;
+ case 'floors':S.floors=+v;while(S.rpf.length<S.floors)S.rpf.push(S.rpf[0]||4);break;
+ case 'rpf':var idx=+v.split(/[+-]/)[0],d=v.indexOf('+')>-1?1:-1;S.rpf[idx]=Math.max(1,Math.min(30,(S.rpf[idx]||S.rpf[0]||1)+d));break;
+ case 'same':S.same=v==='1';if(!S.same){var base=S.rpf[0]||4;for(var j=0;j<nFloors();j++)S.rpf[j]=S.rpf[j]||base;}break;
+ case 'paint':S.paint=+v;break;
+ case 'room':var p=v.split('-');S.types[p[0]][+p[1]]=S.paint;break;
+ case 'copy1':ensureTypes();for(var f=2;f<=nFloors();f++){S.types[f]=S.types[1].slice(0,roomsOn(f));while(S.types[f].length<roomsOn(f))S.types[f].push(2);}toast(t('copied'));break;
+ case 'rent':var r=v.split('-');S.rent[r[0]]=+r[1];S.rentOther[r[0]]=false;break;
+ case 'rentOther':S.rentOther[v]=true;S.rent[v]=0;break;
+ case 'food':S.food=v;break;
+ case 'deposit':S.deposit=v;break;
+ case 'notice':S.notice=v;break;
+ case 'due':S.due=v;break;
+ case 'cycle':var c=v.split('-');S.types[c[0]][+c[1]]=S.types[c[0]][+c[1]]%4+1;break;
+ case 'soon':toast(t('soon'));return;
+ case 'changeNum':S.otpSent=false;S.otp='';confirmation=null;break;
+ case 'logout':if(auth)auth.signOut();S=fresh();try{localStorage.removeItem(KEY);}catch(e){}break;
+ case 'restart':S=fresh();break;
+ }
+ render();
+ if(a==='rentOther'){var inp=document.querySelector('[data-in="rent-'+v+'"]');if(inp)inp.focus();}
+ if(a==='next'&&STEPS[S.step]==='phone'){var o=document.getElementById('otp');if(o)o.focus();}
+});
+/* ---------- real login (Firebase) ---------- */
+var SDK='https://www.gstatic.com/firebasejs/10.12.2/';
+function loadScript(src){return new Promise(function(ok,no){var e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=no;document.head.appendChild(e);});}
+function startFirebase(){
+ return loadScript(SDK+'firebase-app-compat.js').then(function(){return Promise.all([loadScript(SDK+'firebase-auth-compat.js'),loadScript(SDK+'firebase-firestore-compat.js')]);}).then(function(){
+  fb=window.firebase;fb.initializeApp(window.FIREBASE_CONFIG);auth=fb.auth();db=fb.firestore();
+  try{db.enablePersistence({synchronizeTabs:true}).catch(function(){});}catch(e){}
+  auth.onAuthStateChanged(function(u){
+   if(!u){S.uid=null;render();return;}
+   S.uid=u.uid;if(u.phoneNumber)S.phone=u.phoneNumber.replace(/^\+91/,'');
+   db.collection('owners').doc(u.uid).set({phone:u.phoneNumber||'',lang:S.lang,lastLogin:fb.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(){});
+   loadRemote().catch(function(){}).then(function(){
+    S.busy=false;S.otpSent=false;S.otp='';
+    if(S.done)S.step=STEPS.indexOf('ready');else if(S.step<=STEPS.indexOf('phone'))S.step=STEPS.indexOf('phone')+1;
+    render();
+   });
+  });
+ });
+}
+function getVerifier(){if(!verifier){verifier=new fb.auth.RecaptchaVerifier('recaptcha',{size:'invisible'});}return verifier;}
+function authError(err){var c=(err&&err.code)||'';if(c.indexOf('too-many')>-1)return t('tooMany');if(c.indexOf('invalid-verification-code')>-1||c.indexOf('code-expired')>-1)return t('badOtp');if(c.indexOf('network')>-1)return t('netFail');return t('smsFail');}
+function sendOtp(){
+ if(!auth){toast(t('netFail'));return;}
+ S.busy=true;render();auth.languageCode=S.lang==='kn'?'kn':'en';
+ auth.signInWithPhoneNumber('+91'+S.phone,getVerifier()).then(function(c){confirmation=c;S.otpSent=true;S.busy=false;render();var o=document.getElementById('otp');if(o)o.focus();})
+ .catch(function(err){S.busy=false;try{verifier&&verifier.clear();}catch(e){}verifier=null;render();toast(authError(err));});
+}
+function confirmOtp(){
+ if(!confirmation){S.otpSent=false;render();return;}
+ S.busy=true;render();
+ confirmation.confirm(S.otp).catch(function(err){S.busy=false;render();toast(authError(err));});
+ /* on success, onAuthStateChanged moves the owner to the next step */
+}
+if(LIVE){startFirebase().catch(function(){toast(t('netFail'));});}
+render();
+})();
+</script>
+</body>
+</html>
