@@ -87,7 +87,12 @@ button,input{font-family:inherit;color:inherit}
 <script>
 /* Paste your Firebase web config here to turn on real login + saving.
    Leave it as null to run in demo mode (no SMS, data stays on this phone). */
-var FIREBASE_CONFIG = null;
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC31dX7mnpXIYwDlfcjfrw3WcOsx7uZv0Q",
+  authDomain: "pg-manager-997da.firebaseapp.com",
+  projectId: "pg-manager-997da",
+  appId: "1:528032266025:web:b580c967523e80d0592938"
+};
 </script>
 <script>
 (function(){
@@ -382,7 +387,7 @@ function startFirebase(){
  });
 }
 function getVerifier(){if(!verifier){verifier=new fb.auth.RecaptchaVerifier('recaptcha',{size:'invisible'});}return verifier;}
-function authError(err){var c=(err&&err.code)||'';if(c.indexOf('too-many')>-1)return t('tooMany');if(c.indexOf('invalid-verification-code')>-1||c.indexOf('code-expired')>-1)return t('badOtp');if(c.indexOf('network')>-1)return t('netFail');return t('smsFail');}
+function authError(err){var c=(err&&err.code)||'';try{console.error('Firebase auth error:',c,err&&err.message);}catch(e){}if(c.indexOf('too-many')>-1)return t('tooMany');if(c.indexOf('invalid-verification-code')>-1||c.indexOf('code-expired')>-1)return t('badOtp');if(c.indexOf('network')>-1)return t('netFail');return t('smsFail');}
 function sendOtp(){
  if(!auth){toast(t('netFail'));return;}
  S.busy=true;render();auth.languageCode=S.lang==='kn'?'kn':'en';
