@@ -2,4 +2,4 @@
 description: PG CRM project context and rules
 alwaysApply: true
 ---
-Before making changes, read @PROJECT_CONTEXT.md and follow its design rules (one question per screen, tap-only, one language at a time with English default, small mic, Sky blue + amber colours only, every string in T.en and T.kn) and tech decisions (single-file vanilla JS in public/index.html, Firebase Auth + Firestore, owner-scoped rules).
+Before making changes, read @PROJECT_CONTEXT.md and follow its design rules (one question per screen, tap-only, one language at a time with English default, small mic, Sky blue + amber colours only, every string in en and kn) and tech decisions (Android-first Flutter app in app/, UI → state → repository, Firebase Auth + Firestore with pgs/{pgId} model; public/index.html web app is paused).

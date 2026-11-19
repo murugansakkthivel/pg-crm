@@ -1,13 +1,23 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 
+import 'data/pg_repository.dart';
+import 'data/pg_setup.dart';
 import 'strings.dart' as s;
 
 /// Steps built so far. The rest of the 12-screen flow (phone, location,
 /// rooms, room types, rent, deposit, bed board) is added one by one.
 const steps = ['lang', 'for', 'floors', 'food', 'due'];
 
-/// All answers from the owner setup flow. Matches the web app's data model.
+/// All answers from the owner setup flow. Saves through [PgRepository]
+/// shortly after every change, and restores them when the app opens.
 class SetupState extends ChangeNotifier {
+  SetupState(this.repo);
+
+  final PgRepository repo;
+  Timer? _saveTimer;
+
   String lang = 'en';
   int step = 0;
   String? pgFor; // ladies | gents | both
@@ -28,9 +38,33 @@ class SetupState extends ChangeNotifier {
         _ => true,
       };
 
+  PgSetup toSetup() => PgSetup(
+        lang: lang, step: step, pgFor: pgFor, floors: floors, food: food, due: due, done: done);
+
+  /// Restore saved answers (call once at start).
+  Future<void> load() async {
+    final saved = await repo.loadSetup();
+    if (saved == null) return;
+    lang = saved.lang;
+    step = saved.step.clamp(0, steps.length - 1);
+    pgFor = saved.pgFor;
+    floors = saved.floors;
+    food = saved.food;
+    due = saved.due;
+    done = saved.done;
+    notifyListeners();
+  }
+
   void update(void Function() change) {
     change();
     notifyListeners();
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 300), saveNow);
+  }
+
+  Future<void> saveNow() {
+    _saveTimer?.cancel();
+    return repo.saveSetup(toSetup());
   }
 
   void next() => update(() {
@@ -48,4 +82,10 @@ class SetupState extends ChangeNotifier {
           step--;
         }
       });
+
+  @override
+  void dispose() {
+    _saveTimer?.cancel();
+    super.dispose();
+  }
 }

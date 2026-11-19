@@ -95,7 +95,7 @@ Table stakes: **UPI QR payment** and **WhatsApp reminders**. Gap: none are Kanna
 
 ---
 
-## 4. Owner setup flow (built: `public/index.html`)
+## 4. Owner setup flow (web version built in `public/index.html`; Android version in progress in `app/`)
 
 | # | Screen | Answer type |
 |---|---|---|
@@ -118,32 +118,61 @@ Design mockups of these screens: Claude Design canvas "PG Manager — Owner Setu
 
 ## 5. Tech decisions (current)
 
-- **Phase 1: a mobile web app (PWA-style), one file:** `public/index.html` — **vanilla JS, no build step**, all CSS and JS inline.
-  - Why: the founder is not an Android developer; fastest to put in front of owners via a link; "Add to Home screen". Store apps come later (Flutter or React Native can reuse the same backend).
-- **Backend: Firebase.**
-  - **Auth:** Firebase Phone Auth (SMS OTP, invisible reCAPTCHA). Needs the Blaze plan.
-  - **DB:** Cloud Firestore (region `asia-south1`, Mumbai), offline persistence on.
-  - **Hosting:** Firebase Hosting (`firebase deploy`), with `public/` as the root.
-- **Demo mode:** if `var FIREBASE_CONFIG = null;`, the app runs with no SMS (any 6-digit OTP) and keeps data in `localStorage`. Paste the Firebase web config to go live (see `README.md`).
-- **Data model**
+**Decided 19 Nov 2026: Android app first, built in Flutter.** The single-file web app (`public/index.html`) is paused and kept as a reference for screens, copy and the data model. Owners are on cheap Android phones, and a real app gives offline use, SMS autofill, voice and the Play Store.
+
+### Architecture
+```
+Phone (Flutter, app/)                      Cloud (Firebase, project pg-manager-997da)
+  UI: screens & widgets                      Auth: phone OTP
+   ↕                                         Firestore (asia-south1, Mumbai)
+  State: SetupState (ChangeNotifier)         Cloud Functions: WhatsApp reminders,
+   ↕                                           UPI payment webhooks, receipts, cron
+  Repository (PgRepository)  ⇄ internet ⇄    Storage: ID photos, notebook photos
+   ↕
+  Local cache (on phone; Firestore offline cache later)
+```
+- **Screens never touch the database.** They go through the repository (`app/lib/data/pg_repository.dart`). Today `LocalPgRepository` saves to the phone (shared_preferences); a `FirestorePgRepository` replaces it without changing any screen.
+- **Server code is required** whatever the DB: reminders must go out when the owner's phone is off, and UPI payments must mark rent paid automatically.
+
+### Database: Firebase (Cloud Firestore)
+Chosen over Supabase/Postgres and a custom server because:
+1. **Offline is built in** (owners on patchy internet can mark rent paid and it syncs later).
+2. Data per PG is small (a 50-bed PG ≈ a few thousand records a year), so read costs are tiny and NoSQL is fine. Cross-PG reports later via BigQuery export.
+3. Already set up (project, rules, India SMS region enabled). Blaze is needed anyway for Cloud Functions.
+4. SMS can later move to an Indian provider (MSG91, DLT) while keeping the DB.
+Revisit Supabase only if heavy accounting/GST/multi-PG reporting becomes urgent.
+
+- **Auth:** Firebase Phone Auth. Real SMS needs the **Blaze plan** (project is still on Spark as of 19 Nov 2026). For testing, use **test phone numbers** (Authentication → Sign-in method → Phone), which send no SMS.
+- **Data model (new, PG at the top level)** — supports multiple PGs, staff logins and the white-label app without a migration:
   ```
-  owners/{uid}            phone, lang, lastLogin
-  owners/{uid}/pgs/main   lang, phone, pgFor, loc{lat,lng}, floors, same, rpf[],
-                          types (JSON string: {floor: [beds per room]}),
-                          rent (JSON string: {bedsPerRoom: amount}), rentOther,
-                          food, deposit, notice, due, done, step, updatedAt
+  pgs/{pgId}                      name, pgFor, loc, floors, food, deposit, notice, due,
+                                  rent {beds: amount}, branding…, members {uid: role}
+  pgs/{pgId}/rooms/{roomId}       number (101…), floor, beds, sizeSqFt
+  pgs/{pgId}/tenants/{tenantId}   name, phone, roomId, bed, joined, deposit, status
+  pgs/{pgId}/payments/{id}        tenantId, month "2026-11", amount, paid, method, paidAt
+  later: complaints, expenses, compliance
   ```
-  Later: `pgs/{pgId}` for multiple PGs; `tenants`, `payments`, `complaints`, `expenses` sub-collections; every record scoped by owner/PG.
-- **Security rules** (`firestore.rules`): an owner can read and write only `owners/{their uid}/**`; everything else is denied.
-- Saving: answers save to Firestore about 0.7 s after each change (debounced). On login, the app loads saved answers. If setup is done, it opens the bed board; otherwise it resumes after the phone step.
-- i18n: an object `T = { en: {...}, kn: {...} }` with keys and `{placeholder}` substitution; other languages fall back to English.
-- Voice: Web Speech API (`SpeechRecognition` to fill answers, `speechSynthesis` to read questions aloud) in `en-IN` / `kn-IN`. It doesn't work inside the claude.ai preview; it should work on the deployed site in Chrome but is untested.
+  Security rules: a user can read/write a PG only if their uid is in `members`.
+- Field names in the app's `PgSetup` (`app/lib/data/pg_setup.dart`) match Firestore.
+- **i18n:** `app/lib/strings.dart`, a map with `en` and `kn`, `{placeholder}` substitution, English fallback.
+- **Voice:** to do (Android speech-to-text and text-to-speech, `en-IN` / `kn-IN`).
+
+### Running costs (estimates, Nov 2026; check current prices)
+| Item | Price | Notes |
+|---|---|---|
+| Firestore | Free up to 50k reads + 20k writes per day | ≈ 30+ PGs fit in the free tier |
+| Cloud Functions | Free up to 2M calls/month | |
+| Phone OTP (Firebase) | ≈ ₹5 per SMS | Owners stay logged in, so few per month. MSG91 ≈ ₹0.50 later |
+| WhatsApp utility message | ≈ ₹0.115 + GST + provider fee | ≈ 4 per tenant per month |
+| Google Play developer account | $25 one time | |
+Rough monthly total: **₹0 while testing**, **~₹500 at 10 PGs**, **~₹6,000 at 100 PGs (5,000 beds)**, mostly WhatsApp + SMS. Set a budget alert in Google Cloud.
 
 ### Code conventions
-- Keep the single file until it hurts; then split into `public/js/*.js` modules **without** adding a build step unless needed.
-- UI is rendered from state (`S`) via `render()`; clicks are handled by one delegated listener on `data-act` / `data-val`.
-- Every user-facing string goes into `T.en` **and** `T.kn`.
-- Stick to the colour tokens above; don't add new colours.
+- Flutter app lives in `app/`. Imports use `package:material_ui/material_ui.dart` (Flutter 3.50).
+- UI → state → repository; no database calls in widgets.
+- Every user-facing string goes into both `en` **and** `kn` in `strings.dart`.
+- Stick to the colour tokens in `app/lib/theme.dart` (same as above); don't add new colours.
+- Run `flutter analyze` and `flutter test` before committing.
 - Commit small, with clear messages; push to `main` on `github.com/murugansakkthivel/pg-crm`.
 
 ---
@@ -151,9 +180,12 @@ Design mockups of these screens: Claude Design canvas "PG Manager — Owner Setu
 ## 6. Roadmap
 
 **MVP (version 1)**
-- [x] Owner setup flow (12 screens)
-- [x] Phone OTP login + saving (Firebase; needs project config)
-- [ ] Deploy to Firebase Hosting with real config
+- [x] Owner setup flow (12 screens) — web version
+- [ ] Android app (Flutter): setup flow — 5 of 12 screens done (language, PG for, floors, food, rent due), answers saved on the phone
+- [ ] Android: remaining setup screens (phone/OTP, location, rooms, room types, rent, deposit, bed board)
+- [ ] Android: Firebase login + `FirestorePgRepository` with the new `pgs/{pgId}` model and rules
+- [ ] Upgrade Firebase to Blaze (real SMS, Cloud Functions)
+- [ ] Play Store internal test with 5 owners
 - [ ] Add tenant: tenant fills their own details from a **WhatsApp link** (name, phone, ID photo, emergency contact, deposit); owner taps Approve
 - [ ] Bed board states: empty / occupied / rent due (amber) / notice given
 - [ ] Monthly rent list; mark cash paid in one tap; **UPI QR / payment link** that marks paid automatically

@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pg_crm/data/pg_repository.dart';
+import 'package:pg_crm/data/pg_setup.dart';
 import 'package:pg_crm/main.dart';
 import 'package:pg_crm/setup_state.dart';
 
 void main() {
   testWidgets('setup flow: language, PG for, floors, food, due', (tester) async {
-    final state = SetupState();
+    final repo = MemoryPgRepository();
+    final state = SetupState(repo);
     await tester.pumpWidget(PgApp(state: state));
 
     expect(find.text('Choose your language'), findsOneWidget);
@@ -35,11 +38,30 @@ void main() {
 
     expect(find.text('Which day is rent due?'), findsOneWidget);
     await tester.tap(find.text('Finish setup'));
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400)); // let the save run
     expect(find.text('Your PG is ready!'), findsOneWidget);
-    expect(state.pgFor, 'ladies');
-    expect(state.floors, 3);
-    expect(state.food, '0');
-    expect(state.due, '1');
+
+    final saved = repo.saved!;
+    expect(saved.pgFor, 'ladies');
+    expect(saved.floors, 3);
+    expect(saved.food, '0');
+    expect(saved.due, '1');
+    expect(saved.done, isTrue);
+  });
+
+  test('saved answers come back when the app reopens', () async {
+    final repo = MemoryPgRepository()
+      ..saved = const PgSetup(lang: 'kn', step: 2, pgFor: 'gents');
+    final state = SetupState(repo);
+    await state.load();
+    expect(state.lang, 'kn');
+    expect(state.current, 'floors');
+    expect(state.pgFor, 'gents');
+  });
+
+  test('PgSetup survives a round trip through a map', () {
+    const a = PgSetup(lang: 'kn', step: 4, pgFor: 'both', floors: 2, food: '3', due: 'join', done: true);
+    final b = PgSetup.fromMap(a.toMap());
+    expect(b.toMap(), a.toMap());
   });
 }
